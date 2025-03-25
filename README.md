@@ -26,6 +26,7 @@ Cálculo automático de valores
 
 Autorização de serviços pelo cliente
 
+![Entidade e relacionamento](Imagem/Oficina.png) *(Exemplo de visualização)*  
 2. Modelagem do Banco de Dados
 2.1. Diagrama Entidade-Relacionamento
 ```
