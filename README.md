@@ -290,8 +290,104 @@ describe('Testes de Ordem de Serviço', () => {
     });
 });
 ```
+# 4.2. Testes de Integração
+```
+// tests/integration/clienteOS.test.js
+describe('Integração Cliente-OS', () => {
+    it('deve listar todas as OS de um cliente', async () => {
+        // Criar cliente e OS de teste primeiro
+        const response = await request(app)
+            .get('/clientes/12345678901/os');
+            
+        expect(response.status).toBe(200);
+        expect(response.body).toBeInstanceOf(Array);
+    });
+});
+```
+5. Implantação
+5.1. Dockerfile
+```
+FROM node:14
 
+WORKDIR /app
 
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
+```
+5.2. docker-compose.yml
+```
+version: '3'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=oficina
+  
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=oficina
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+```
+# 6. Documentação da API
+## 6.1. Endpoints Principais
+Método	Endpoint	Descrição
+POST	/clientes	Cadastrar novo cliente
+GET	/clientes/{cpf}/os	Listar OS de um cliente
+POST	/os	Criar nova ordem de serviço
+PUT	/os/{id}/autorizar	Autorizar execução de serviços
+GET	/os/{id}/relatorio	Gerar relatório completo da OS
+
+6.2. Exemplo de Request/Response
+```
+// POST /os
+{
+  "clienteCPF": "12345678901",
+  "veiculoPlaca": "ABC1234",
+  "equipeId": 1,
+  "servicos": [
+    {
+      "codigo": 101,
+      "quantidade": 1
+    }
+  ],
+  "pecas": [
+    {
+      "codigo": 205,
+      "quantidade": 2
+    }
+  ]
+}
+
+// Response 201
+{
+  "Numero_OS": 1001,
+  "Valor_Total": 450.00,
+  "Status": "Aguardando autorização"
+}
+```
 
 
 
